@@ -1,0 +1,14 @@
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Release\UTechEmailGateway.exe.config
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Release\UTechEmailGateway.exe
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Release\UTechEmailGateway.pdb
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Release\ADKCoreEngine_CLR.dll
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Release\OpenPop.dll
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\MainWindow.baml
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\MainWindow.g.cs
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\App.g.cs
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway_MarkupCompile.cache
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.g.resources
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.Properties.Resources.resources
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.csproj.GenerateResource.Cache
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.exe
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.pdb

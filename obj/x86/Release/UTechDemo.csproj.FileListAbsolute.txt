@@ -1,0 +1,14 @@
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\bin\Release\UTechDemo.exe.config
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\bin\Release\UTechDemo.exe
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\bin\Release\UTechDemo.pdb
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\bin\Release\ADKCoreEngine_CLR.dll
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\bin\Release\OpenPop.dll
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\MainWindow.baml
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\MainWindow.g.cs
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\App.g.cs
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\UTechDemo_MarkupCompile.cache
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\UTechDemo.g.resources
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\UTechDemo.Properties.Resources.resources
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\UTechDemo.csproj.GenerateResource.Cache
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\UTechDemo.exe
+C:\Users\HYT.2RFTY52\Desktop\UTechDemo\obj\x86\Release\UTechDemo.pdb

@@ -1,0 +1,14 @@
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Debug\OpenPop.dll
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.csprojResolveAssemblyReference.cache
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\MainWindow.baml
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\MainWindow.g.cs
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\App.g.cs
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.csproj.GenerateResource.Cache
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Debug\UTechEmailGateway.exe.config
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Debug\UTechEmailGateway.exe
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\bin\Debug\UTechEmailGateway.pdb
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway_MarkupCompile.cache
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.g.resources
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.Properties.Resources.resources
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.exe
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.pdb

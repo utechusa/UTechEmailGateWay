@@ -1,0 +1,15 @@
+
+------------ Thu May 05 17:05:48 2016
+TRACER : freed 10000 buffers(0 null buffers) & 0 buffer misses
+
+------------ Thu May 05 17:10:24 2016
+TRACER : freed 10000 buffers(0 null buffers) & 0 buffer misses
+
+------------ Thu May 05 17:13:16 2016
+TRACER : freed 10000 buffers(0 null buffers) & 0 buffer misses
+
+------------ Thu May 05 17:14:46 2016
+TRACER : freed 10000 buffers(0 null buffers) & 0 buffer misses
+
+------------ Thu May 05 17:20:35 2016
+TRACER : freed 10000 buffers(0 null buffers) & 0 buffer misses
