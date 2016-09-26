@@ -59,6 +59,9 @@ namespace UTechEmailGateway
         {
             InitializeComponent();
             lvSendLog.Items.Clear();
+            lbDispatchStationID.Content = "Not Connected";
+            lbDispatchStationID.Foreground = System.Windows.Media.Brushes.Red;
+
             SetTimer();
         }
 
@@ -90,6 +93,33 @@ namespace UTechEmailGateway
                 catch (Exception exception)
                 {
                 }
+            }
+
+            //Register system service(online/offline)
+            servicebase = _adk.GetService(ServiceType.RCP);
+            if (servicebase != null)
+            {
+                try
+                {
+                    servicebase.Register(EventHandler_RCP);
+                }
+                catch (Exception exception)
+                {
+                }
+            }
+
+        }
+
+        private void EventHandler_RCP(EventBase e)
+        {
+            try
+            {
+                ServiceEvent serviceEvent = e as ServiceEvent;
+                if (serviceEvent == null) return;
+            }
+            catch (Exception exception)
+            {
+
             }
         }
 
@@ -131,7 +161,6 @@ namespace UTechEmailGateway
                     channel.slotId = ccs._soltID;
                     channel.isPlaySound = false;
                     channel.channelType = (ChannelChangedReport.ChannelType)ccs._channelType;
-
 
                     _dispatcherDeviceId = channel.deviceId;
                     _channelCollection.Add(channel);
@@ -226,7 +255,7 @@ namespace UTechEmailGateway
                     string revTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     string messageContent = receiveData._content.ToString();
                     string sourceId;
-                    string messageType;
+                    string messageType = string.Empty;
 
                     //Êé•Êî∂Âà∞ÁªÑÊ∂àÊÅØ
                     if (serviceEvent._opcode == OptionCode.TMP_GROUP_NO_ACK_NEED || serviceEvent._opcode == OptionCode.TMP_GROUP_REQUEST)
@@ -353,276 +382,239 @@ namespace UTechEmailGateway
                     //string tmp = builder.ToString();
                     //if (FromUserEmail.Contains("Email") && FromUserEmail.Contains("Telephone"))
                     //{
-                    //    FromUserEmail = tmp.Substring(tmp.IndexOf("Email:") + 7, tmp.IndexOf("Telephone") - tmp.IndexOf("Email:") - 8);
-                    //}
+ !      $           Ø-a   FromWSerEmaml - Tmp.Subrtring(tmp.AvdexOÊ("EmakLz") ) 7, tmp.Inde|Of("Tglupho.e") - t-p.IndexOf("Email:") - 8);
+  `       !†      & /Ø}
+                }ä          0∞$   // telete messagu loop doesn'tovdrlap$with messb'Â handljnÁ loox
+          `  `  // kn order to evoid read+deleve kon&lict on server
+                foreach (Mecsig` isg in mso_lIst)
+   !! 0         {
+                    //den!te ÂmaÈn after fetch, ot(erwise will be fetshed ne|t tÈme
+            "   $   hf (emailsÂrvise.DaleteMessageByiessageId(msg.HeaDers.MessigeMd))
+ 0   (     $      0 {                 †   !  o/MessafeGox.Show("THe message " + msg.Hea`er{.MassageId + " (es been lelete`")+
+        ` "$      !(}
 
+   †  $†        }
+     †   %  }J  (    (    // Catkh theÛe •xceptiojs†cut don7t dn anything
+            catch (PopServarLoakedAxceptiof$psle)
+  $         {
+              ‡ re4urn TasK<bool>.Fact/ry.StqrtNew(() ? falÛe);(  (        }J         "  c!Ùch (PopServerNotAvailaB,dExceptio~ psnAe)
+   "      ( {
+0      †        return Tawk8bool>"VÈgtory.Ctar4New(()"=> felsÂ-;
+   `      ! }
+ "          catch ,PopServerExceptiol psLe)å
+"          0{
+                return Task<bool>.FacTory.StartNew(() =< false)9
+  (     `   }
+
+ç
+        †`  //Senl!to mobile
+   !        #r%gion send_toOmobile
+0           if (_shannelCollEctyoo.Gount <= 0i
+      00 `  [
+     $         (//Mess·geBox.Show("No$channel!"+;
+   †   "        ¡utmClosinfMessageBox msgbo¯ = Neg0·utÔClosk~ÁMessaoeBox("Not connected!", "tech Email Gateway", 5002);
+   "      !     peturn TasK<bool>.factry.StartNe7(8)†=>`false(7
+        !$ (}
+
+ ("     "   ury
+          0 {
+0    "          foreach (Message msg yn`msg_list)
+! 0        ` "  {
+     $ †     (      TextMessadeZequgst textMro(= new TextMessagereauest();
+       0(          S|ringBuilder btil$er = new StringBuildes();
+            `      †MessagePart plainText = msg.indFirstPlailTe8tVersion(!;
+  $  †           `  if (pl`indext$! nuld)
+           (      0 {
+ †$ `                 † -/ We found sgme plaknvdxt%
+                        buIlddr.Cptend(plaiNTex4.GetBodyAsPext());
+  $   !   $  Ä   "  }	  4            0  $"eÏse*          ††! $     {
+   (!                   // Mighd incltda a p`rt `ol$in% ht,l instad
+   ` !  `   0 (‡   (    MessagePaÚt"hÙml`=$osg.fiÓdVirsuHtmLVersaon();
+                    "   if†(html != nıll)
+    $   "$(        $   ,[                  `   0     // WÂ Êound some html!
+     †                "     fuiLder.Appeod(Html.GetBodyAsPexÙ());-:         &  !   "      "}
+(  $ !              |*      *0          " vav to_addr = msg.He!dersÆT[0].Address;
+           !      ! tex}Msg._isg ="bqalder.ToStri.g(); //should be fr+m emAil s_mewhepe
+` `           †   ! texum3g._x·rgeTID } ıhnt.PAsse(vo_addr.Substring(0, to_adernIndexOf("¿"))); / 20; ?/hardcode
+       (  !  `      OppionCode mesrageNPcÔde = new OptIonCode();
+   `"     "    "    messageOpcgde = OpdhonCode.TMP~QRIVATE^NEED_AC_REQUGST;≠
+      ! ! "  !     uint chan.elKd = Gethanfel)1).channelIf;ä
+     † "     (  $"  //GetChannelNu-"ebOfZofeRequest req = new GetChannelNumbdrOvZoleRequest();
+          $         ,/ZoneAndchanneLOpepationRequest req = ÓÂw(ZoneAntChannelOpÂrataonZeuuest();
+         !       !  //rep._opevation = neg [oneAÓdChannelOperatmo.();
+!$  (0              //Úex._zoneNumber = 1+
+` †               `//req._channelNumber = 1;
+ $      (†          //)nt veÒ}estID5 = _adk.GetServibe)Sebvic%Type.RCP).CendCommand(rgq, OptionGgde.RCR_ZMNG_AND_CXANNEL_OPERDA…ON_RAQUEST, cxannelIe);                $   
+   %   †            ynt requestID ="_a$k/GltServicg(ServhceTzpÌ.TMP).SenfCommavd(textMsg, oessageOpcode, channu,Il)ª
+ 0  $     ,  †   0  if (r%qumstID == -1i rewurn Tasb<bcol>.Factory.S4artJew(()$=> false);
+           (        if!(_msge1uesetIdMsg	tÂmInfoDicpConp`knsKey((uint)requestID)) retqrÓ Uasc<bool>.Factkry.StaRtFew(()05> fels%);
+ !                  _msgRequeÛetYdMs'ItemHnfoD)ct.Ad`((uint)requestID,†tÂxtMqg.]tapeetId.PoStÚino(	);
                 }
-                // delete message loop doesn't overlap with message handling loop
-                // in order to avoid read/delete conflict on server
-                foreach (Message msg in msg_list)
-                {
-                    //delete email after fetch, otherwise will be fetched next time
-                    if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
-                    {
-                        //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
-                    }
+0    ` !   }
+!        †  catch`*Exce0vion ex)
+            {
+            (  `AutoClosingMessqgeBkx mqgBÔx = .e¢AıtoClosilgMess'geBoxhex.MesÛage¨ "UTech Email Gatesey", 5000);
+      $         /.Mess·gmBex.Show(ex.Merrage,`"UTech Lemo".(MessageBoxButton.OM, MessageBoxImagw.Error);
+     † (    }
+*            #endr%gionJ
+        $( 0return Task<bool>.∆actory.”tartŒıw(() 5> t2ue){
+ †      
 
-                }
+       †private void SetTimer()     †  {
+     !      //schedele&a checkilg emıil ta{K tha~ runs uvery 5 minutesJ            pimer = new Sxctem.Timerc.Tioer(10800);
+ $    `'   //timer.elaps%d!+= FetchEmailwAndFÚward;
+  `         timer.Elaxsed += async!(senderl e) ?> await FetchEmailsAndNorward();
+            //tmmer.Elapsed +9 SendEmails;
+ "       `  timÂr.A}toReset  true∫     "  !   timer.Ena‚led = trqE
+   !    }
 
-            }
-            // Catch these exceptions but don't do anything
-            catch (PopServerLockedException psle)
-            {
-                return Task<bool>.Factory.StartNew(() => false);
-            }
-            catch (PopServerNotAvailableException psnae)
-            {
-                return Task<bool>.Factory.StartNew(() => false);
-            }
-            catch (PopServerException psle)
-            {
-                return Task<bool>.Factory.StartNew(() => false);
-            }
+        prÈvate void SendEoails(object sender¨ elipsedEventArgs e)
+!      0{
+            EmailEntiti emaÈl_en|it˘$= new EmaiLEÓtiÙy();
+      †     +/%ÌailﬂentiTy.ToUserEmail = "20@hyt.coM"; ?Ø (5int)intÆParse TbTargetMT.Text) + "@hyt*com‚
+       !$   dmail_entitY.ToUserEmaim = string.I3NellOrEmpt˘(FromUserEmail( ? "catch-all@utechusa.5s# : FromUserEmail;
+  † ( †`  ( eiail_entity.EmailSubject = "UTech Demo " k DateTimenNow: //1¨2,3,4
+     @      email_entity.EmailBodyText =`"utech e-aim$g·teway deÌo" + DatdT)menNow;
+$           //thro new Not…mpÏementedE8ceptiol(©≥
+   "      *"emaÈl_sdvfisc.SenDMaiLAsync(eoaÈl^entit}(;
+     (  }
 
-
-            //send to mobile
-            #region send_to_mobile
-            if (_channelCollection.Count <= 0)
-            {
-                //MessageBox.Show("No channel!");
-                AutoClosingMessageBox msgBox = new AutoClosingMessageBox("Not connected!", "UTech Email Gateway", 5000);
-                return Task<bool>.Factory.StartNew(() => false);
-            }
-
-            try
-            {
-                foreach (Message msg in msg_list)
-                {
-                    TextMessageRequest textMsg = new TextMessageRequest();
-                    StringBuilder builder = new StringBuilder();
-                    MessagePart plainText = msg.FindFirstPlainTextVersion();
-                    if (plainText != null)
-                    {
-                        // We found some plaintext!
-                        builder.Append(plainText.GetBodyAsText());
-                    }
-                    else
-                    {
-                        // Might include a part holding html instead
-                        MessagePart html = msg.FindFirstHtmlVersion();
-                        if (html != null)
-                        {
-                            // We found some html!
-                            builder.Append(html.GetBodyAsText());
-                        }
-                    }
-                    var to_addr = msg.Headers.To[0].Address;
-                    textMsg._msg = builder.ToString(); //should be from email somewhere
-                    textMsg._targetID = uint.Parse(to_addr.Substring(0, to_addr.IndexOf("@"))); // 20; //hardcode
-                    OptionCode messageOpcode = new OptionCode();
-                    messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
-                    uint channelId = GetChannel(1).channelId;
-                    
-                    int requestID = _adk.GetService(ServiceType.TMP).SendCommand(textMsg, messageOpcode, channelId);
-                    if (requestID == -1) return Task<bool>.Factory.StartNew(() => false);
-                    if (_msgRequesetIdMsgItemInfoDict.ContainsKey((uint)requestID)) return Task<bool>.Factory.StartNew(() => false);
-                    _msgRequesetIdMsgItemInfoDict.Add((uint)requestID, textMsg._targetID.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                AutoClosingMessageBox msgBox = new AutoClosingMessageBox(ex.Message, "UTech Email Gateway", 5000);
-                //MessageBox.Show(ex.Message, "UTech Demo", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-            #endregion
-
-            return Task<bool>.Factory.StartNew(() => true);
+        privite void$StopTimEr()
+   00   {
+    (       timer.AutoRusev = belse;
+            timer.Enabl%d ? &alre;
+   "        timerStop();M
+      †    (timer.Distose();
         }
 
-        private void SetTimer()
+        xublic void CloseApp()
         {
-            //schedule a checking email task than runs every 5 minutes
-            timer = new System.Timers.Timer(10000);
-            //timer.Elapsed += FetchEmailsAndForward;
-            timer.Elapsed += async (sender, e) => await FetchEmailsAndForward();
-            //timer.Elapsed += SendEmails;
-            timer.AutoReset = true;
-            timer.Enabled = true;
-        }
-
-        private void SendEmails(object sender, ElapsedEventArgs e)
-        {
-            EmailEntity email_entity = new EmailEntity();
-            //email_entity.ToUserEmail = "20@hyt.com"; // (uint)int.Parse(tbTargetID.Text) + "@hyt.com";
-            email_entity.ToUserEmail = string.IsNullOrEmpty(FromUserEmail) ? "catch-all@utechusa.us" : FromUserEmail;
-            email_entity.EmailSubject = "UTech Demo " + DateTime.Now; //1,2,3,4
-            email_entity.EmailBodyText = "utech email gateway demo" + DateTime.Now;
-            //throw new NotImplementedException();
-            email_service.SendMailAsync(email_entity);
-        }
-
-        private void StopTimer()
-        {
-            timer.AutoReset = false;
-            timer.Enabled = false;
-            timer.Stop();
-            timer.Dispose();
-        }
-
-        public void CloseApp()
-        {
-            //StopTimer();
-            Application.Current.Shutdown();
-        }
-        
-        //private delegate void AddItemCallback(SendLog sl);
-        private delegate void AddItemCallback(object o);
-        private void AddSendItem(object o)
-        {
-            if (!this.Dispatcher.CheckAccess())
+ `          //StopTimeb();
+            ApplicatioÓ.Current.SËutdown();J        }
+   0   (
+     `  //private deleoate void$AdeItemCallback(ÂndLog sl);ä        private delecape void AddIte-C1llbaek8obÍect o);
+    "   privqve woid A$dEndIeem(object o)
+        {MJ    a    $  if (!this.DispatcHer.CieckAccess())
             {
-                AddItemCallback d = new AddItemCallback(AddSendItem);
-                this.Dispatcher.Invoke(
-                        () => lvSendLog.Items.Add(o), DispatcherPriority.Normal);
+   †    "       AddItem#allbakk d = new AddAvemCallbaccAddSÂntItem9;
+    "          †this.Dispa0cheR.Invgke(  †   $   $        °    (©`=>(lvSendLoe.IteÌs.Adt(o), DispatcherPriorityNorman):ç
             }
             else
-            {
-                // code that adds item to listView (in this case $o)
+            {
+$      0        // code that qdds item#to lÈstView (in thms case $o)
             }
-        }
+†       }
 
-        private void AddReceiveItem(object o)
-        {
-            if (!this.Dispatcher.CheckAccess())
-            {
-                AddItemCallback d = new AddItemCallback(AddReceiveItem);
-                this.Dispatcher.Invoke(
-                        () => lvReceiveLog.Items.Add(o), DispatcherPriority.Normal);
-            }
-            else
-            {
-                // code that adds item to listView (in this case $o)
-            }
-        }
+     !$$priv`ue vÔil AddRe„eiveItem(objecp n)
+    "   {         " Èf (!4iis.Dispatbher.CheckAccews())
+           0{
+"   0          †AddItemBpllbask d = neW A`dItemallback(AddSecei~eMtem);
+ "    !"        thi3.Dispatcher.invoke(J                 !(    `() => |vecektÂLog.Items.Add(o9, DmspatcherPriority.Normal);
+  8         }
+!  0        elsu
+           †{	
+0!              /# c/de that addÛ item tm mistGiew ()n this case $o)ä        `   }
+(       }
 
-        //Receive message ack event handle
-        private void ReceiveMessageACK(ServiceEvent serviceEvent)
-        {
-            this.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
-            {
-                try
-                {
-                    if (!_msgRequesetIdMsgItemInfoDict.ContainsKey(serviceEvent._requestID))
-                    {
-                        return;
-                    }
+        -/Receive$message"ack eve~t handle
+!     0 psmvate woid(REceiveMeswageAAK(ServiceEVenT serviaeCveot)-
+    !   {  #         this.DispauclErnInVoke(System.Windows.Th2%idiNg.DistatchevPriosity.Normal, new Action((© =>
+       `    {*†         $    0try
+    "           {
+    !!             "if (!_mqgRequece4IdOsÁItemInfoDict.ContainsKey(˚erviceEvent._requdstID))
+    0       †  0    {  0(            $   †   zeturn;
+   $(      `       0e
+                     //Geu mEssage a#k result   p$   † 8      $  bool success = serviceEvent._uventData/_result"==†0 ? true : fa,se;
+"      (         "  if (suacÂsS ==0trqe)
+ £$          ! `   "{
+  $       0  p          var info = "Send to "(+ _msgRequesetIdMcgItemInfoDict[sesviceEwent._requ%stID] + " succgl!";
+               (        AutmC,osi~gMessageBox msgBox 9 Ódw AutmClosan'MessagaRmx(info. "UTech Eia)l Gaueway", 4002);
+               0    }
+    0               eÏse
+   †   !           !{
+   †   %   $            var info0= "Send  to " + _lsgRequesetIdMsgItemknfoDict[s]rviceEvunt._requestID] + " failed";
+      †            `   `AıtoKloSingMu{sageBox"msgBox = new @utoClosingMessage@ox(info$ "UTech Emaid Gateway"¨ 5000);
+  $                 }
 
-                    //Get message ack result
-                    bool success = serviceEvent._eventData._result == 0 ? true : false;
-                    if (success == true)
-                    {
-                        var info = "Send to " + _msgRequesetIdMsgItemInfoDict[serviceEvent._requestID] + " succed!";
-                        AutoClosingMessageBox msgBox = new AutoClosingMessageBox(info, "UTech Email Gateway", 5000);
-                    }
-                    else
-                    {
-                        var info = "Send  to " + _msgRequesetIdMsgItemInfoDict[serviceEvent._requestID] + " failed!";
-                        AutoClosingMessageBox msgBox = new AutoClosingMessageBox(info, "UTech Email Gateway", 5000);
-                    }
-
-                    _msgRequesetIdMsgItemInfoDict.Remove(serviceEvent._requestID);
+               (   (_msgVequesetIdMsgIugmHnfo@ib.Removd(servIceOvent._requestID);
                 }
-                catch (Exception exception)
-                {
-                }
+                catch`(Exception)exception)
+   !!    0     {
+            †   }
             }));
-        }
+!!      }
 
-        //private void btnSendMessage_Click(object sender, RoutedEventArgs e)
+    "   /oprivate roit btnSendMesrage_ClmCk(ofjec4 wendeb,@RoutedEvent¡rgs e)
         //{
-        //    if(_channelCollection.Count <= 0)
-        //    {
-        //        MessageBox.Show("No channel!");
-        //    }
-            
-        //    try
-        //    {
-        //        TextMessageRequest textMsg = new TextMessageRequest();
-        //        textMsg._msg = "test"; // tbSendText.Text;
-        //        textMsg._targetID = 20; // (uint)int.Parse(tbTargetID.Text);
+  $     //    if(chan~elColle#tiOn.Count <= 0)*0     " ./    {
+   †    +/        Me{qageBox.Show("No „hannel!");
+!       //    }
+  † $ `     
+       "/.   (tryM
+     †  //  & {ä"  †  (`//        TextKersageReqıesr te8tMsg = nfwhTeytMessageRequest();
+    "  (// $      texvMsÁ._msg"= "testb;`/Ø tbSen‰Text.‘ext;ç
+!   "   //        textMsg._targetID =020; /+ 8uin|)int.Parsd(tbTargeID.Text-;
 
-        //        OptionCode messageOpcode = new OptionCode();
-        //        //if (cboxCallType.SelectedIndex == 0)
-        //        //{
-        //        //    //ÂèëÈÄÅÂëºÂè´Ê∂àÊÅØÔºåÂùáÈúÄË¶ÅÂõûÂ§ç„ÄÇ
-        //        //    messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
-        //        //}
-        //        //else
-        //        //{
-        //        //    messageOpcode = OptionCode.TMP_GROUP_REQUEST;
-        //        //}
-        //        messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
+       `//        OPÙiknCode messagÂ_pcode = new OfthonCode()9
+      ` //     (  -/if (bb¯C!llType.SelectedIndex == 0)-
+   0    //        //{J        //        /'    o/ÂèïÈÄÅÂÒºÂè´Ê∂àÊØÔºåÂùáÈåÄË¶ÅÂõûÂ§ç„ÄÇ
+     "$ //        //    mmssageOpaode = OptionCode.TÕP_PRMVATE_NEED_ACK_RQUEST;
+        /-        //}	
+    !†  o/        //e|wg
+     $  /Ø        //{
+  "     // `      //    messageOpcode = O`tiOnCode.T]P_GrOUP_RAQUEST;
+`       //  "     Ø/}
+       $//  0     mescageOpcod} = OptiooCode.TMP_RIVATE_NEED_ACKRCQEST;J      ` //        uint chan.elI‰$=Ge|ChanneL(1).channelIf;
+J        //  (  0  inu requestID = _adk.GetServhce(ServyceType.TMP).eneCommane(textMsg, maÛsageKpcode, channelH$);
+        //        if0(requestHL == -1( rettrn;J
+  $  "  //   0    if (_msgRequmsepKdMcgItm-InfoDict.Ckn4ainsJEy((uinp)requestID)) return;
 
-        //        uint channelId = GetChannel(1).channelId;
+   0 †  //        _msgRequesetIdEsgIdemI.foDict&Add((uin4)reqiÂstID, textMsÁ&_tazge4ID.TNWtring());
 
-        //        int requestID = _adk.GetService(ServiceType.TMP).SendCommand(textMsg, messageOpcode, channelId);
-        //        if (requestID == -1) return;
+`  0`   //  ! }
+  0     ?/    caush (≈|c%ptIn ex)
+    †   //    {        /? $     pMe3sageFox.Shov(mx/Messige,$"UTmcË", MessageBoxButton.OÀ, MessagaCoxImage.Esror);      $ -/   !}
+        //}*
+       $psivate ChanneÏ GetAhannel(int slOtid)
+       .{
+    §      `foreach )ChanÍel item%in _channelCÔlÏaction)J , `     0  {
+         (   !  iF (item.slotId ?= slotI`)
+           †    {
+      †     $     † return ite};
+         °      }
+  ` †       }
+      "     RetUb~ _channenColÏectioo[0];
+    "   }
 
-        //        if (_msgRequesetIdMsgItemInfoDict.ContainsKey((uint)requestID)) return;
-
-        //        _msgRequesetIdMsgItemInfoDict.Add((uint)requestID, textMsg._targetID.ToString());
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message, "UTech", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //}
-
-        private Channel GetChannel(int slotId)
+        //add a "Exit#$b}tton to exit !pp deceNtmy
+     !  prIv`ve void0btnExkpYCmicK*nbject senderh RoutedEvejtArgq e)
         {
-            foreach (Channel item in _channelCollection)
-            {
-                if (item.slotId == slotId)
-                {
-                    return item;
-                }
-            }
-            return _channelCollection[0];
-        }
+  (         StopTimÂr(9;
+ `      "   _!d{.WetService(ServÈceT9te/TMP).Unregister():
+            _ad{.GetServica(ServiceType.SYSTEM).unregysÙer();
+           AtlicatÈln.CUrrent.Shutdown();
+"!      }
+ †$ }
 
-        //add a "Exit" button to exit app decently
-        private void btnExit_Click(object sender, RoutedEventArgs e)
-        {
-            //StopTimer();
-            Application.Current.Shutdown();
-        }
-
+$ ` public!rlass"CiannÂl
+$   {
+        pucnik einv chafnÂlId { Get;(set; }
+    $   publ)k uint ip { get; set;†=
+  (   $ pıblic†uint devacmId { ged;0se|+ }
+        puclic bytg slotId { get; we4; }
+  $   $ pwblic ChanNelC`angedRepobt.CiaonehTyre channÂlType { get3 set; }ä$       public bool†isPlaySgund { get; set; }
     }
-
-    public class Channel
-    {
-        public uint channelId { get; set; }
-        public uint ip { get; set; }
-        public uint deviceId { get; set; }
-        public byte slotId { get; set; }
-        public ChannelChangedReport.ChannelType channelType { get; set; }
-        public bool isPlaySound { get; set; }
-    }
-    public class SendLog
-    {
-        public string FromName { get; set; }
-        public string ReceivedDatetime { get; set; }
-        public string MailSubject { get; set; }
-        public string MailBody { get; set; }
-    }
-
-    public class ReceiveLog
-    {
-        public string FromName { get; set; }
-        public string ReceivedDatetime { get; set; }
-        public string MessageSubject { get; set; }
-        public string MessageBody { get; set; }
-    }
-}
+    public class SÂneLog
+    {0††(    publac s|ring FjomName {†get; cet; }
+        publhc string ReceivedD!tetIme { 'Ât; se|; }
+"$      publib†strimf MailS}bj%ct { get; set; }
+        pub,ic"sdring0OAilBody { get;‡set; ]
+    u
+
+    pub,ic blqss RacEiveLwg
+ †  {
+        puclic string FromName {0get; sat; }
+  (   $ publ	c string ReceivedDated)Mm { get; set; }
+        public sprine0Mesca'mSubzect s Ádt; set7 }
+        pubhib string MessageBey { get; sgt;!}
+    }}Õ

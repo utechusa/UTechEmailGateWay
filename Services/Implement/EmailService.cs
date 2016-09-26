@@ -12,18 +12,19 @@ using OpenPop.Pop3;
 using OpenPop.Mime;
 using System.IO;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace UTechEmailGateway.Services.Implement
 {
     public class EmailService : IEmailService
     {
-        public const string PopServerHost = "secureus40.sgcpanel.com";
-        public const UInt16 port = 995;
-        public const string username = "catch-all@utechusa.us";
-        public const string password = "Tr@d3sh0w";
+        //public const string PopServerHost = "secureus40.sgcpanel.com";
+        //public const UInt16 port = 995;
+        //public const string username = "catch-all@utechusa.us";
+        //public const string password = "Tr@d3sh0w";
         public const string CRLF = "\r\n";
 
-        Pop3Client client;
+        //Pop3Client client;
 
         public EmailService()
         {
@@ -48,16 +49,18 @@ namespace UTechEmailGateway.Services.Implement
             {
                 //throw new ArgumentNullException("EmailBodyText & EmailBodyHtml");
             }
-            string smtpAddress = PopServerHost; // "smtp.mail.yahoo.com";
-            int portNumber = 587; // 465;
+            //string smtpAddress = PopServerHost; // "smtp.mail.yahoo.com";
+            string smtpAddress = ConfigurationManager.AppSettings.Get("SmtpServerHost");
+            int port = int.Parse(ConfigurationManager.AppSettings.Get("SmtpServerPort"));  //587; // 465;
             bool enableSSL = true;
 
             //Create SMTP client, the configration is in the web.config file, system.net/mailSettings/smtp
-            smtpServer = new SmtpClient(smtpAddress, portNumber);
+            smtpServer = new SmtpClient(smtpAddress, port);
             //Yahoo!	smtp.mail.yahoo.com	587	Yes
             //GMail	    smtp.gmail.com	    587	Yes
             //Hotmail	smtp.live.com	    587	Yes
-            //smtpServer.Host = WebConfigurationManager.AppSettings["SmtpHost"].ToString();
+            string username = ConfigurationManager.AppSettings.Get("UserName");
+            string password = ConfigurationManager.AppSettings.Get("Password");
             smtpServer.Credentials = new NetworkCredential(username, password);
             //smtpServer.UseDefaultCredentials = false;
             smtpServer.EnableSsl = enableSSL;
@@ -123,13 +126,17 @@ namespace UTechEmailGateway.Services.Implement
             return await Task.Run(() => Send(emailEntity));
         }
 
-        static System.IO.StreamWriter sw = null;
-        static System.Net.Sockets.TcpClient tcpc = null;
-        static SslStream _sslStream = default(SslStream);
+        //static System.IO.StreamWriter sw = null;
+        //static System.Net.Sockets.TcpClient tcpc = null;
+        //static SslStream _sslStream = default(SslStream);
 
         //public List<Message> FetchAllMessages(string hostname, int port, bool useSsl, string username, string password)
         public List<Message> FetchAllMessages()
         {
+            string PopServerHost = ConfigurationManager.AppSettings.Get("PopServerHost");
+            int port = int.Parse(ConfigurationManager.AppSettings.Get("PopServerPort"));
+            string username = ConfigurationManager.AppSettings.Get("UserName");
+            string password = ConfigurationManager.AppSettings.Get("Password");
             // The client disconnects from the server when being disposed
             using (Pop3Client client = new Pop3Client())
             {
@@ -166,6 +173,11 @@ namespace UTechEmailGateway.Services.Implement
             // The client disconnects from the server when being disposed
             using (Pop3Client client = new Pop3Client())
             {
+                string PopServerHost = ConfigurationManager.AppSettings.Get("PopServerHost");
+                int port = int.Parse(ConfigurationManager.AppSettings.Get("PopServerPort"));
+                string username = ConfigurationManager.AppSettings.Get("UserName");
+                string password = ConfigurationManager.AppSettings.Get("Password");
+
                 // Connect to the server
                 client.Connect(PopServerHost, port, true);
 
@@ -201,6 +213,8 @@ namespace UTechEmailGateway.Services.Implement
                     }
                 }
 
+                client.Disconnect();
+                client.Dispose();
                 // Return our new found messages
                 return newMessages;
             }
@@ -254,6 +268,10 @@ namespace UTechEmailGateway.Services.Implement
             // The client disconnects from the server when being disposed
             using (Pop3Client client = new Pop3Client())
             {
+                string PopServerHost = ConfigurationManager.AppSettings.Get("PopServerHost");
+                int port = int.Parse(ConfigurationManager.AppSettings.Get("PopServerPort"));
+                string username = ConfigurationManager.AppSettings.Get("UserName");
+                string password = ConfigurationManager.AppSettings.Get("Password");
                 // Connect to the server
                 client.Connect(PopServerHost, port, true);
 

@@ -12,3 +12,4 @@ C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway
 C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.csproj.GenerateResource.Cache
 C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.exe
 C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.pdb
+C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Release\UTechEmailGateway.csprojResolveAssemblyReference.cache
