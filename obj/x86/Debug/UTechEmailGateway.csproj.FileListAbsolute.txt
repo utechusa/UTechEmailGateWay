@@ -12,3 +12,6 @@ C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.P
 C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.exe
 C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.pdb
 C:\Users\HYT.2RFTY52\Desktop\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.csprojResolveAssemblyReference.cache
+E:\UTechEmailGateway\bin\Debug\UTechEmailGateway.exe.config
+E:\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.exe
+E:\UTechEmailGateway\obj\x86\Debug\UTechEmailGateway.pdb
