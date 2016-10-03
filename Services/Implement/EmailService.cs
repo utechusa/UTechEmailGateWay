@@ -100,7 +100,7 @@ namespace UTechEmailGateway.Services.Implement
             //Email Subject
             if (!string.IsNullOrWhiteSpace(emailEntity.EmailSubject))
             {
-                mailMessage.Subject = emailEntity.EmailSubject;
+                mailMessage.Subject = emailEntity.EmailSubject.TrimEnd();
             }
 
             //Email Body
@@ -193,9 +193,9 @@ namespace UTechEmailGateway.Services.Implement
                 // All the new messages not seen by the POP3 client
                 for (int i = 0; i < uids.Count; i++)
                 {
-                    string currentUidOnServer = uids[i];
-                    if (!seenUids.Contains(currentUidOnServer))
-                    {
+                    //string currentUidOnServer = uids[i];
+                    //if (!seenUids.Contains(currentUidOnServer))
+                    //{
                         // We have not seen this message before.
                         // Download it and add this new uid to seen uids
 
@@ -209,8 +209,8 @@ namespace UTechEmailGateway.Services.Implement
                         newMessages.Add(unseenMessage);
 
                         // Add the uid to the seen uids, as it has now been seen
-                        seenUids.Add(currentUidOnServer);
-                    }
+                        //seenUids.Add(currentUidOnServer);
+                    //}
                 }
 
                 client.Disconnect();
