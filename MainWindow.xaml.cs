@@ -41,10 +41,6 @@ namespace UTechEmailGateway
         IEmailService email_service = new EmailService();
 
         uint _dispatcherDeviceId = 0;
-        //public const string PopServerHost = "pop.mail.yahoo.com";
-        //public const UInt16 port = 995;
-        //public const string username = "betterlife99@yahoo.com";
-        //public const string password = "nuligongzuo";
         public const string CRLF = "\r\n";
 
         List<SendLog> sendlog_items = new List<SendLog>();
@@ -52,6 +48,7 @@ namespace UTechEmailGateway
         Timer timer;
         List<string> seenUids = new List<string>();
         uint dispatchStationID = 0;
+        List<Person> contactList = new List<Person>();
 
         string FromUserEmail = string.Empty;
 
@@ -71,6 +68,9 @@ namespace UTechEmailGateway
             //ADK Initial
             _adk.Initialize();
 
+            contactsEntities contacts = new contactsEntities();
+            contactList = (from c in contacts.People
+                               select c).ToList();
 
             //Register Text message service
             ServiceBase servicebase = _adk.GetService(ServiceType.TMP);
@@ -306,95 +306,23 @@ namespace UTechEmailGateway
 
         private Task<bool> FetchEmailsAndForward()
         {
+            //send to mobile
+            #region send_to_mobile
+            if (_channelCollection.Count <= 0)
+            {
+                //MessageBox.Show("No channel!");
+                AutoClosingMessageBox msgBox = new AutoClosingMessageBox("Retrying ...", "Not connected!", 2000);
+                return Task<bool>.Factory.StartNew(() => false);
+            } 
+            
             List<Message> msg_list = null;
             try
             {
                 msg_list = email_service.FetchUnseenMessages(seenUids);
-                //List<Message> msg_list = email_service.FetchUnseenMessages(PopServerHost, port, true, username, password, seenUids);
-                //List<Message> msg_list = email_service.FetchAllMessages();
-                //lvSendLog.Items.Clear();
-
-                ////log file info
-                //string fpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                //string fname = "email.log";
-                //// This file will have a new line at the end.
-                //FileInfo info = new FileInfo(fpath + "\\" + fname);
-
                 if (msg_list.Count == 0)
                 {
                     return Task<bool>.Factory.StartNew(() => false);
                 }
-                //foreach (Message msg in msg_list)
-                //{
-                //    //FromUserEmail = msg.Headers.From.Address;
-                //    var toaddr = msg.Headers.To;
-                //    //if (!(msg.Headers.From.Address.Contains("@utechusa.us")
-                //    //    || msg.Headers.From.Address.Contains("@gmail.com"))) continue;
-                //    StringBuilder builder = new StringBuilder();
-                //    string strEmailInfo = string.Empty;
-                //    strEmailInfo += msg.Headers.Date;
-                //    strEmailInfo += CRLF;
-                //    strEmailInfo += msg.Headers.From.Address;
-                //    strEmailInfo += CRLF;
-                //    strEmailInfo += msg.MessagePart.Body;
-                //    strEmailInfo += CRLF;
-
-                //    MessagePart plainText = msg.FindFirstPlainTextVersion();
-                //    if (plainText != null)
-                //    {
-                //        // We found some plaintext!
-                //        builder.Append(plainText.GetBodyAsText());
-                //    }
-                //    else
-                //    {
-                //        // Might include a part holding html instead
-                //        MessagePart html = msg.FindFirstHtmlVersion();
-                //        if (html != null)
-                //        {
-                //            // We found some html!
-                //            builder.Append(html.GetBodyAsText());
-                //        }
-                //    }
-
-                //    //save email into log file
-                //    using (StreamWriter writer = info.AppendText())
-                //    {
-                //        //writer.WriteLine(tbSendText.Text);
-                //        writer.WriteLine(strEmailInfo);
-                //    }
-
-                //    //sendlog_items.Add(new SendLog()
-                //    //{
-                //    //    FromName = msg.Headers.From.DisplayName + msg.Headers.From.Address,
-                //    //    ReceivedDatetime = msg.Headers.Date,
-                //    //    MailSubject = msg.Headers.Subject,
-                //    //    MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd()
-                //    //    //MailBody = msg.MessagePart.Body == null ? "" : msg.MessagePart.Body.ToString()
-                //    //});
-
-
-                //    AddSendItem(new SendLog()
-                //    {
-                //        FromName = msg.Headers.From.ToString(),
-                //        //FromName = msg.Headers.Sender == null ? "" : msg.Headers.Sender.ToString(),
-                //        ReceivedDatetime = msg.Headers.Date,
-                //        MailSubject = msg.Headers.Subject,
-                //        MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd(),
-                //        Status = string.Empty
-                //    });
-                //}
-                //// delete message loop doesn't overlap with message handling loop
-                //// in order to avoid read/delete conflict on server
-                //foreach (Message msg in msg_list)
-                //{
-                //    //delete email after fetch, otherwise will be fetched next time
-                //    if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
-                //    {
-                //        //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
-                //    }
-
-                //}
-
             }
             // Catch these exceptions but don't do anything
             catch (PopServerLockedException psle)
@@ -410,20 +338,11 @@ namespace UTechEmailGateway
                 return Task<bool>.Factory.StartNew(() => false);
             }
 
-
-            //send to mobile
-            #region send_to_mobile
-            if (_channelCollection.Count <= 0)
-            {
-                //MessageBox.Show("No channel!");
-                AutoClosingMessageBox msgBox = new AutoClosingMessageBox("Not connected!", "UTech Email Gateway", 5000);
-                return Task<bool>.Factory.StartNew(() => false);
-            }
-
             try
             {
                 //log file info
-                string fpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                //string fpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string fpath = Directory.GetCurrentDirectory();
                 string fname = "email.log";
                 // This file will have a new line at the end.
                 FileInfo info = new FileInfo(fpath + "\\" + fname);
@@ -451,27 +370,30 @@ namespace UTechEmailGateway
                     //}
                     var to_addr = msg.Headers.To[0].Address;
                     textMsg._msg = builder.ToString().TrimEnd() + CRLF; //should be from email somewhere
-                    textMsg._targetID = uint.Parse(to_addr.Substring(0, to_addr.IndexOf("@"))); // 20; //hardcode
+                    textMsg._targetID = uint.Parse(contactList.Find(x => x.Email.Equals(to_addr)).TargetID); // uint.Parse(to_addr.Substring(0, to_addr.IndexOf("@")));
                     OptionCode messageOpcode = new OptionCode();
                     messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
                     uint channelId = GetChannel(1).channelId;
 
-                    //GetChannelNumberOfZoneRequest req = new GetChannelNumberOfZoneRequest();
-                    ZoneAndChannelOperationRequest req = new ZoneAndChannelOperationRequest();
-                    //req._operation = new ZoneAndChannelOperation();
-                    //req._zoneNumber = 1;
-                    //req._channelNumber = 1;
-                    //int requestID1 = _adk.GetService(ServiceType.RCP).SendCommand(req, OptionCode.RCP_ZONE_AND_CHANNEL_OPERTATION_REQUEST, channelId);
-                    
                     int requestID = _adk.GetService(ServiceType.TMP).SendCommand(textMsg, messageOpcode, channelId);
-                    if (requestID == -1) return Task<bool>.Factory.StartNew(() => false);
+                    if (requestID == -1) continue; // return Task<bool>.Factory.StartNew(() => false);
                     if (_msgRequesetIdMsgItemInfoDict.ContainsKey((uint)requestID)) return Task<bool>.Factory.StartNew(() => false);
                     _msgRequesetIdMsgItemInfoDict.Add((uint)requestID, textMsg._targetID.ToString());
 
-                    //FromUserEmail = msg.Headers.From.Address;
-                    //var toaddr = msg.Headers.To;
-                    //if (!(msg.Headers.From.Address.Contains("@utechusa.us")
-                    //    || msg.Headers.From.Address.Contains("@gmail.com"))) continue;
+                    //if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
+                    //{
+                    //    //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
+                    //}
+                    sendlog_items.Add(new SendLog()
+                    {
+                        ID = requestID,
+                        EmailID = msg.Headers.MessageId,
+                        FromName = msg.Headers.From.DisplayName + msg.Headers.From.Address,
+                        ReceivedDatetime = DateTime.Now.ToString(), //msg.Headers.Date,
+                        MailSubject = msg.Headers.Subject,
+                        MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd()
+                    });
+
                     string strEmailInfo = string.Empty;
                     strEmailInfo += "Date: " + DateTime.Now; // msg.Headers.Date;
                     strEmailInfo += CRLF;
@@ -494,19 +416,6 @@ namespace UTechEmailGateway
                         writer.WriteLine(strEmailInfo);
                     }
 
-                    //sendlog_items.Add(new SendLog()
-                    //{
-                    //    FromName = msg.Headers.From.DisplayName + msg.Headers.From.Address,
-                    //    ReceivedDatetime = msg.Headers.Date,
-                    //    MailSubject = msg.Headers.Subject,
-                    //    MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd()
-                    //    //MailBody = msg.MessagePart.Body == null ? "" : msg.MessagePart.Body.ToString()
-                    //});
-
-                    //if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
-                    //{
-                    //    //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
-                    //}
 
 
                     //AddSendItem(new SendLog()
@@ -518,12 +427,12 @@ namespace UTechEmailGateway
                     //    MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd(),
                     //    Status = requestID == -1 ? "Failed" : "Successful"
                     //});
-                    SendItem.EmailID = msg.Headers.MessageId;
-                        SendItem.FromName = msg.Headers.From.ToString();
-                        //FromName = msg.Headers.Sender == null ? "" : msg.Headers.Sender.ToString(),
-                        SendItem.ReceivedDatetime = DateTime.Now.ToString(); // msg.Headers.Date;
-                        SendItem.MailSubject = msg.Headers.Subject;
-                        SendItem.MailBody = Regex.Replace(mail_body, @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd();
+                        //SendItem.EmailID = msg.Headers.MessageId;
+                        //SendItem.FromName = msg.Headers.From.ToString();
+                        ////FromName = msg.Headers.Sender == null ? "" : msg.Headers.Sender.ToString(),
+                        //SendItem.ReceivedDatetime = DateTime.Now.ToString(); // msg.Headers.Date;
+                        //SendItem.MailSubject = msg.Headers.Subject;
+                        //SendItem.MailBody = Regex.Replace(mail_body, @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd();
                         //SendItem.Status = requestID == -1 ? "Failed" : "Successful";
                 }
                 // delete message loop doesn't overlap with message handling loop
@@ -628,14 +537,15 @@ namespace UTechEmailGateway
                         return;
                     }
 
+                    SendItem = sendlog_items.Find(item => item.ID == serviceEvent._requestID);
                     //Get message ack result
                     bool success = serviceEvent._eventData._result == 0 ? true : false;
                     if (success == true)
                     {
-                        var info = "Send to " + _msgRequesetIdMsgItemInfoDict[serviceEvent._requestID] + " succed!";
+                        var info = "Sent to " + _msgRequesetIdMsgItemInfoDict[serviceEvent._requestID] + " successfully!";
                         SendItem.Status = "Successful";
-                        //AddSendItem(SendItem);
                         lvSendLog.Items.Add(SendItem);
+                        sendlog_items.Remove(SendItem);
                         //AutoClosingMessageBox msgBox = new AutoClosingMessageBox(info, "UTech Email Gateway", 5000);
                         if (email_service.DeleteMessageByMessageId(SendItem.EmailID))
                         {
@@ -645,9 +555,10 @@ namespace UTechEmailGateway
                     else
                     {
                         var info = "Send  to " + _msgRequesetIdMsgItemInfoDict[serviceEvent._requestID] + " failed!";
+                        SendItem.Status = "Successful";
                         SendItem.Status = "Failed";
-                        //AddSendItem(SendItem);
                         lvSendLog.Items.Add(SendItem);
+                        sendlog_items.Remove(SendItem);
                         //AutoClosingMessageBox msgBox = new AutoClosingMessageBox(info, "UTech Email Gateway", 5000);
                     }
 
@@ -658,47 +569,6 @@ namespace UTechEmailGateway
                 }
             }));
         }
-
-        //private void btnSendMessage_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if(_channelCollection.Count <= 0)
-        //    {
-        //        MessageBox.Show("No channel!");
-        //    }
-            
-        //    try
-        //    {
-        //        TextMessageRequest textMsg = new TextMessageRequest();
-        //        textMsg._msg = "test"; // tbSendText.Text;
-        //        textMsg._targetID = 20; // (uint)int.Parse(tbTargetID.Text);
-
-        //        OptionCode messageOpcode = new OptionCode();
-        //        //if (cboxCallType.SelectedIndex == 0)
-        //        //{
-        //        //    //发送呼叫消息，均需要回复。
-        //        //    messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
-        //        //}
-        //        //else
-        //        //{
-        //        //    messageOpcode = OptionCode.TMP_GROUP_REQUEST;
-        //        //}
-        //        messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
-
-        //        uint channelId = GetChannel(1).channelId;
-
-        //        int requestID = _adk.GetService(ServiceType.TMP).SendCommand(textMsg, messageOpcode, channelId);
-        //        if (requestID == -1) return;
-
-        //        if (_msgRequesetIdMsgItemInfoDict.ContainsKey((uint)requestID)) return;
-
-        //        _msgRequesetIdMsgItemInfoDict.Add((uint)requestID, textMsg._targetID.ToString());
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message, "UTech", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //}
 
         private Channel GetChannel(int slotId)
         {
@@ -734,6 +604,7 @@ namespace UTechEmailGateway
     }
     public class SendLog
     {
+        public int ID { get; set; }
         public string FromName { get; set; }
         public string ReceivedDatetime { get; set; }
         public string MailSubject { get; set; }

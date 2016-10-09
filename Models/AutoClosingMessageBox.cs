@@ -15,7 +15,13 @@ namespace UTechEmailGateway.Models
             _caption = caption;
             _timeoutTimer = new System.Threading.Timer(OnTimerElapsed,
                 null, timeout, System.Threading.Timeout.Infinite);
-            MessageBox.Show(text, caption);
+            //MessageBox.Show(text, caption);
+            DialogResult dialogResult = MessageBox.Show(text, caption);
+            //if (dialogResult == DialogResult.OK)
+            //{
+            //    //do something
+            //    return;
+            //}
         }
 
         public static void Show(string text, string caption, int timeout)
