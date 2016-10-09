@@ -269,6 +269,9 @@ namespace UTechEmailGateway
                         messageType = "Private";
                     }
 
+                    Person p = contactList.Find(x => x.TargetID.TrimEnd().Equals(sourceId.ToString()));
+                    if (p == null) return;
+
                     //tbReceiveText.Text += revTime + "   " + messageType + "   " + sourceId + "\n"
                     //                        + "Content: " + messageContent + "\n";
                     lvReceiveLog.Items.Add(new ReceiveLog()
@@ -276,14 +279,15 @@ namespace UTechEmailGateway
                         FromName = sourceId, //tbTargetID.Text,
                         //FromName = msg.Headers.Sender == null ? "" : msg.Headers.Sender.ToString(),
                         ReceivedDatetime = revTime,
-                        MessageSubject = "RE: " + messageContent.Substring(0, messageContent.IndexOf(CRLF)).TrimEnd() + CRLF,
+                        MessageSubject = "RE: " + messageContent.Substring(0, messageContent.IndexOf(CRLF)).TrimEnd(),
                         MessageBody = messageContent == null ? "" : messageContent.Substring(messageContent.IndexOf(CRLF) + 2),
                         Status = "Success"
                     });
 
                     //forward this message to HotSos by email
                     EmailEntity email_entity = new EmailEntity();
-                    //email_entity.ToUserEmail = "20@hyt.com"; // (uint)int.Parse(tbTargetID.Text) + "@hyt.com";
+                    email_entity.FromUserEmail = p.Email;
+                    email_entity.FromUserDisplayName = p.FirstName + " " + p.LastName;
                     email_entity.ToUserEmail =  ConfigurationManager.AppSettings.Get("SenderEmail");
                     email_entity.EmailSubject = "RE: " + messageContent.Substring(0, messageContent.IndexOf(CRLF)).TrimEnd() + CRLF; //1,2,3,4
                     email_entity.EmailBodyText = messageContent == null ? "" : messageContent.Substring(messageContent.IndexOf(CRLF) + 2);
@@ -349,28 +353,24 @@ namespace UTechEmailGateway
 
                 foreach (Message msg in msg_list)
                 {
+                    var to_addr = msg.Headers.To[0].Address;
+                    Person p = contactList.Find(x => x.Email.TrimEnd().Equals(to_addr));
+                    if (p == null)
+                    {
+                        if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
+                        {
+                            //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
+                            WriteMessageLog(info, msg);
+                        }
+                        continue;
+                    }
+
                     TextMessageRequest textMsg = new TextMessageRequest();
                     StringBuilder builder = new StringBuilder();
                     builder.Append(msg.Headers.Subject);
-                    //MessagePart plainText = msg.FindFirstPlainTextVersion();
-                    //if (plainText != null)
-                    //{
-                    //    // We found some plaintext!
-                    //    builder.Append(plainText.GetBodyAsText());
-                    //}
-                    //else
-                    //{
-                    //    // Might include a part holding html instead
-                    //    MessagePart html = msg.FindFirstHtmlVersion();
-                    //    if (html != null)
-                    //    {
-                    //        // We found some html!
-                    //        builder.Append(html.GetBodyAsText());
-                    //    }
-                    //}
-                    var to_addr = msg.Headers.To[0].Address;
-                    textMsg._msg = builder.ToString().TrimEnd() + CRLF; //should be from email somewhere
-                    textMsg._targetID = uint.Parse(contactList.Find(x => x.Email.Equals(to_addr)).TargetID); // uint.Parse(to_addr.Substring(0, to_addr.IndexOf("@")));
+
+                    textMsg._msg = builder.ToString().TrimEnd() + CRLF;
+                    textMsg._targetID = uint.Parse(p.TargetID);
                     OptionCode messageOpcode = new OptionCode();
                     messageOpcode = OptionCode.TMP_PRIVATE_NEED_ACK_REQUEST;
                     uint channelId = GetChannel(1).channelId;
@@ -380,72 +380,39 @@ namespace UTechEmailGateway
                     if (_msgRequesetIdMsgItemInfoDict.ContainsKey((uint)requestID)) return Task<bool>.Factory.StartNew(() => false);
                     _msgRequesetIdMsgItemInfoDict.Add((uint)requestID, textMsg._targetID.ToString());
 
-                    //if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
-                    //{
-                    //    //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
-                    //}
+                    
                     sendlog_items.Add(new SendLog()
                     {
                         ID = requestID,
                         EmailID = msg.Headers.MessageId,
-                        FromName = msg.Headers.From.DisplayName + msg.Headers.From.Address,
+                        FromName = (string.IsNullOrEmpty(msg.Headers.From.DisplayName) ? "" : "<" + msg.Headers.From.DisplayName + ">") + msg.Headers.From.Address,
                         ReceivedDatetime = DateTime.Now.ToString(), //msg.Headers.Date,
                         MailSubject = msg.Headers.Subject,
                         MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd()
                     });
+                    WriteMessageLog(info, msg);
+                    //string strEmailInfo = string.Empty;
+                    //strEmailInfo += "Date: " + DateTime.Now; // msg.Headers.Date;
+                    //strEmailInfo += CRLF;
+                    //string display_name = msg.Headers.From.DisplayName == null ? "" : "<" + msg.Headers.From.DisplayName + ">";
+                    //strEmailInfo += "From: " + display_name + msg.Headers.From.Address;
+                    //strEmailInfo += CRLF;
+                    //display_name = msg.Headers.To.FirstOrDefault().DisplayName == null ? "" : "<" + msg.Headers.To.FirstOrDefault().DisplayName + ">";
+                    //strEmailInfo += "To: " + display_name + msg.Headers.To.FirstOrDefault().Address;
+                    //strEmailInfo += CRLF;
+                    //strEmailInfo += "Subject: " + msg.Headers.Subject;
+                    //strEmailInfo += CRLF;
+                    //string mail_body = msg.FindFirstPlainTextVersion() != null ? msg.FindFirstPlainTextVersion().GetBodyAsText() : msg.FindFirstHtmlVersion().GetBodyAsText();
+                    //strEmailInfo += "Body: " + mail_body;
+                    //strEmailInfo += CRLF;
 
-                    string strEmailInfo = string.Empty;
-                    strEmailInfo += "Date: " + DateTime.Now; // msg.Headers.Date;
-                    strEmailInfo += CRLF;
-                    string display_name = msg.Headers.From.DisplayName == null ? "" : "<" + msg.Headers.From.DisplayName + ">";
-                    strEmailInfo += "From: " + display_name + msg.Headers.From.Address;
-                    strEmailInfo += CRLF;
-                    display_name = msg.Headers.To.FirstOrDefault().DisplayName == null ? "" : "<" + msg.Headers.To.FirstOrDefault().DisplayName + ">";
-                    strEmailInfo += "To: " + display_name + msg.Headers.To.FirstOrDefault().Address;
-                    strEmailInfo += CRLF;
-                    strEmailInfo += "Subject: " + msg.Headers.Subject;
-                    strEmailInfo += CRLF;
-                    string mail_body = msg.FindFirstPlainTextVersion() != null ? msg.FindFirstPlainTextVersion().GetBodyAsText() : msg.FindFirstHtmlVersion().GetBodyAsText();
-                    strEmailInfo += "Body: " + mail_body;
-                    strEmailInfo += CRLF;
-
-                    //save email into log file
-                    using (StreamWriter writer = info.AppendText())
-                    {
-                        //writer.WriteLine(tbSendText.Text);
-                        writer.WriteLine(strEmailInfo);
-                    }
-
-
-
-                    //AddSendItem(new SendLog()
+                    ////save email into log file
+                    //using (StreamWriter writer = info.AppendText())
                     //{
-                    //    FromName = msg.Headers.From.ToString(),
-                    //    //FromName = msg.Headers.Sender == null ? "" : msg.Headers.Sender.ToString(),
-                    //    ReceivedDatetime = msg.Headers.Date,
-                    //    MailSubject = msg.Headers.Subject,
-                    //    MailBody = Regex.Replace(builder.ToString(), @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd(),
-                    //    Status = requestID == -1 ? "Failed" : "Successful"
-                    //});
-                        //SendItem.EmailID = msg.Headers.MessageId;
-                        //SendItem.FromName = msg.Headers.From.ToString();
-                        ////FromName = msg.Headers.Sender == null ? "" : msg.Headers.Sender.ToString(),
-                        //SendItem.ReceivedDatetime = DateTime.Now.ToString(); // msg.Headers.Date;
-                        //SendItem.MailSubject = msg.Headers.Subject;
-                        //SendItem.MailBody = Regex.Replace(mail_body, @"^\s*$\n|\r", "", RegexOptions.Multiline).TrimEnd();
-                        //SendItem.Status = requestID == -1 ? "Failed" : "Successful";
+                    //    //writer.WriteLine(tbSendText.Text);
+                    //    writer.WriteLine(strEmailInfo);
+                    //}
                 }
-                // delete message loop doesn't overlap with message handling loop
-                // in order to avoid read/delete conflict on server
-                //foreach (Message msg in msg_list)
-                //{
-                //    //delete email after fetch, otherwise will be fetched next time
-                //    if (email_service.DeleteMessageByMessageId(msg.Headers.MessageId))
-                //    {
-                //        //MessageBox.Show("The message " + msg.Headers.MessageId + " has been deleted");
-                //    }
-
-                //}
             }
             catch (Exception ex)
             {
@@ -458,6 +425,30 @@ namespace UTechEmailGateway
             return Task<bool>.Factory.StartNew(() => true);
         }
         SendLog SendItem = new SendLog();
+        private void WriteMessageLog(FileInfo info, Message msg)
+        {
+            string strEmailInfo = string.Empty;
+            strEmailInfo += "Date: " + DateTime.Now; // msg.Headers.Date;
+            strEmailInfo += CRLF;
+            string display_name = string.IsNullOrEmpty(msg.Headers.From.DisplayName) ? "" : "<" + msg.Headers.From.DisplayName + ">";
+            strEmailInfo += "From: " + display_name + msg.Headers.From.Address;
+            strEmailInfo += CRLF;
+            display_name = string.IsNullOrEmpty(msg.Headers.To.FirstOrDefault().DisplayName) ? "" : "<" + msg.Headers.To.FirstOrDefault().DisplayName + ">";
+            strEmailInfo += "To: " + display_name + msg.Headers.To.FirstOrDefault().Address;
+            strEmailInfo += CRLF;
+            strEmailInfo += "Subject: " + msg.Headers.Subject;
+            strEmailInfo += CRLF;
+            string mail_body = msg.FindFirstPlainTextVersion() != null ? msg.FindFirstPlainTextVersion().GetBodyAsText() : msg.FindFirstHtmlVersion().GetBodyAsText();
+            strEmailInfo += "Body: " + mail_body;
+            strEmailInfo += CRLF;
+
+            //save email into log file
+            using (StreamWriter writer = info.AppendText())
+            {
+                //writer.WriteLine(tbSendText.Text);
+                writer.WriteLine(strEmailInfo);
+            }
+        }
 
         private void SetTimer()
         {
@@ -555,7 +546,6 @@ namespace UTechEmailGateway
                     else
                     {
                         var info = "Send  to " + _msgRequesetIdMsgItemInfoDict[serviceEvent._requestID] + " failed!";
-                        SendItem.Status = "Successful";
                         SendItem.Status = "Failed";
                         lvSendLog.Items.Add(SendItem);
                         sendlog_items.Remove(SendItem);
